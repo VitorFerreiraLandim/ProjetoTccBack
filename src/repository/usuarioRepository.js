@@ -5,6 +5,7 @@ export async function cadastrarUsuario(pessoa) {
         insert into tb_usuario (nome,telefone,email,senha)
             values(?,?,?,?)
     `
+    
     let resposta = await con.query(comando, [pessoa.nome, pessoa.telefone, pessoa.email, pessoa.senha])
     let info = resposta[0]
 
@@ -24,4 +25,13 @@ export async function validarUsuario(pessoa){
 
     let registros = await con.query(comando, [pessoa.email, pessoa.senha])
     return registros[0][0];
+}
+
+export async function verificarUsuarioExistente(email, telefone) {
+    const comando = `
+        SELECT * FROM tb_usuario 
+        WHERE email = ? OR telefone = ?
+    `;
+    let registros = await con.query(comando, [email, telefone]);
+    return registros[0]; 
 }

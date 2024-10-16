@@ -62,4 +62,23 @@ endpoints.post('/verificar-email', async (req, res) => {
     }
 });
 
+endpoints.post('/verificar-email2/', async (req, resp) => {
+    try {
+        const { email } = req.body;
+
+        const existe = await db.verificarEmail(email);
+
+        if (existe) {
+            resp.send({ existe: true });
+        } else {
+            resp.send({ existe: false });
+        }
+    } catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        });
+    }
+});
+
+
 export default endpoints;

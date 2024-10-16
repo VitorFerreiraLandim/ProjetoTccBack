@@ -35,3 +35,12 @@ export async function verificarUsuarioExistente(email, telefone) {
     let registros = await con.query(comando, [email, telefone]);
     return registros[0]; 
 }
+
+export async function verificarEmail(email) {
+    const comando = `
+        SELECT email FROM tb_usuario 
+        WHERE email = ?
+    `;
+    let registros = await con.query(comando, [email]);
+    return registros[0].length > 0;
+}

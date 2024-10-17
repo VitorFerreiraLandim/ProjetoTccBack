@@ -44,3 +44,4 @@ export async function verificarEmail(email) {
     let registros = await con.query(comando, [email]);
     return registros[0].length > 0;
 }
+

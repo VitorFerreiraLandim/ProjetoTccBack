@@ -1,6 +1,7 @@
 import {autenticar, gerarToken} from '../utils/jwt.js';
 import * as db from '../repository/usuarioRepository.js';
 import { Router } from 'express';
+import nodemailer from 'nodemailer'
 const endpoints = Router();
 
 endpoints.post('/entrar/', async (req, resp) => {
@@ -29,7 +30,7 @@ endpoints.post('/cadastro/',  async (req,resp) => {
     try {
         let pessoa = req.body;
 
-        let id = await db.cadastrarUsuario(pessoa);
+        
 
         const usuarioExistente = await db.verificarUsuarioExistente(pessoa.email, pessoa.telefone);
         if (usuarioExistente.length > 0) {
@@ -37,6 +38,8 @@ endpoints.post('/cadastro/',  async (req,resp) => {
                 erro: "Email ou telefone já cadastrados."
             });
         }
+
+        let id = await db.cadastrarUsuario(pessoa);
 
         resp.send({
             novoId: id
@@ -62,14 +65,23 @@ endpoints.post('/verificar-email', async (req, res) => {
     }
 });
 
-endpoints.post('/verificar-email2/', async (req, resp) => {
+
+
+
+endpoints.post('/verificar-email2', async (req, resp) => {
     try {
         const { email } = req.body;
 
+        
         const existe = await db.verificarEmail(email);
 
         if (existe) {
-            resp.send({ existe: true });
+            const codigo = Math.floor(100000 + Math.random() * 900000); 
+            
+  
+            await enviarEmail(email, codigo);
+            
+            resp.send({ existe: true, codigo }); 
         } else {
             resp.send({ existe: false });
         }
@@ -79,6 +91,43 @@ endpoints.post('/verificar-email2/', async (req, resp) => {
         });
     }
 });
+
+
+async function enviarEmail(email, codigo) {
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: 'vitorferreiralandim14@gmail.com', 
+            pass: 'z a b g e z j v p t c s a l k j' 
+        }
+    });
+
+    const mailOptions = {
+        from: 'vitorferreiralandim14@gmail.com',
+        to: email,
+        subject: 'Código de Redefinição de Senha',
+        html: `
+        <div style="font-family: Arial, sans-serif; background-color: #f7f7f7; padding: 20px; border-radius: 5px;">
+            <div style="max-width: 600px; margin: auto; background-color: white; padding: 20px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <h2 style="color: #6A0DAD;">Redefinição de Senha</h2>
+                <p style="color: #333;">Olá,</p>
+                <p style="color: #333;">Você solicitou a redefinição da sua senha. Use o código abaixo para prosseguir:</p>
+                <h3 style="color: #6A0DAD; font-size: 24px;">${codigo}</h3>
+                <p style="color: #333;">Se você não solicitou essa mudança, pode ignorar este email.</p>
+                <hr style="border: 1px solid #6A0DAD;">
+                <footer style="text-align: center; color: #777;">
+                    <p>&copy; ${new Date().getFullYear()} Sua Empresa. Todos os direitos reservados.</p>
+                </footer>
+            </div>
+        </div>
+    `
+    };
+
+    await transporter.sendMail(mailOptions);
+}
+
 
 
 export default endpoints;

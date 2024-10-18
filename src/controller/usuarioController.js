@@ -78,7 +78,6 @@ endpoints.post('/verificar-email2', async (req, resp) => {
         if (existe) {
             const codigo = Math.floor(100000 + Math.random() * 900000); 
             
-  
             await enviarEmail(email, codigo);
             
             resp.send({ existe: true, codigo }); 
@@ -127,6 +126,22 @@ async function enviarEmail(email, codigo) {
 
     await transporter.sendMail(mailOptions);
 }
+
+endpoints.post('/redifinir-senha', async (req, resp) => {
+    try {
+        const {  novaSenha ,email} = req.body;
+
+        const resultado = await db.redefinirSenha(novaSenha, email );
+
+        if (resultado) {
+            resp.send({ success: true, message: 'Senha redefinida com sucesso!' });
+        } else {
+            resp.status(400).send({ success: false, message: 'Erro ao redefinir a senha. Verifique o e-mail.' });
+        }
+    } catch (err) {
+        resp.status(500).send({ error: err.message });
+    }
+});
 
 
 

@@ -1,4 +1,5 @@
 import con from './connection.js'
+import bcrypt from 'bcrypt';
 
 export async function cadastrarUsuario(pessoa) {
     const comando = `
@@ -44,4 +45,21 @@ export async function verificarEmail(email) {
     let registros = await con.query(comando, [email]);
     return registros[0].length > 0;
 }
+
+export async function redefinirSenha( novaSenha, email) {
+   
+    
+    const comando = `
+        UPDATE tb_usuario 
+        SET senha = ? 
+        WHERE email = ?
+    `;
+    
+    const resultado = await con.query(comando, [novaSenha, email]);
+    console.log(resultado);
+
+    return resultado.affectedRows > 0;
+}
+
+
 

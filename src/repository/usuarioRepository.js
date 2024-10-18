@@ -46,9 +46,7 @@ export async function verificarEmail(email) {
     return registros[0].length > 0;
 }
 
-export async function redefinirSenha( novaSenha, email) {
-   
-    
+export async function redefinirSenha(novaSenha, email) {
     const comando = `
         UPDATE tb_usuario 
         SET senha = ? 
@@ -56,10 +54,9 @@ export async function redefinirSenha( novaSenha, email) {
     `;
     
     const resultado = await con.query(comando, [novaSenha, email]);
-    console.log(resultado);
-
-    return resultado.affectedRows > 0;
+    return resultado[0].affectedRows > 0;
 }
+
 
 
 

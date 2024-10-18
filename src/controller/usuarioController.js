@@ -127,11 +127,11 @@ async function enviarEmail(email, codigo) {
     await transporter.sendMail(mailOptions);
 }
 
-endpoints.post('/redifinir-senha', async (req, resp) => {
+endpoints.post('/redefinir-senha', async (req, resp) => {
     try {
-        const {  novaSenha ,email} = req.body;
+        const { novaSenha, email } = req.body;
 
-        const resultado = await db.redefinirSenha(novaSenha, email );
+        const resultado = await db.redefinirSenha(novaSenha, email);
 
         if (resultado) {
             resp.send({ success: true, message: 'Senha redefinida com sucesso!' });
@@ -139,9 +139,11 @@ endpoints.post('/redifinir-senha', async (req, resp) => {
             resp.status(400).send({ success: false, message: 'Erro ao redefinir a senha. Verifique o e-mail.' });
         }
     } catch (err) {
+        console.error('Erro ao redefinir a senha:', err);
         resp.status(500).send({ error: err.message });
     }
 });
+
 
 
 

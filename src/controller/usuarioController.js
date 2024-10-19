@@ -144,6 +144,45 @@ endpoints.post('/redefinir-senha', async (req, resp) => {
     }
 });
 
+endpoints.delete('/usuario/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const resultado = await db.deletarUsuario(id);
+
+        if (resultado > 0) {
+            res.status(200).send({ message: 'Usuário deletado com sucesso' });
+        } else {
+            res.status(404).send({ message: 'Usuário não encontrado' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erro interno do servidor');
+    }
+});
+
+endpoints.put('/usuarios/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nome } = req.body;
+
+    if (!nome) {
+        return res.status(400).send('O campo nome é obrigatório');
+    }
+
+    try {
+        const resultado = await db.AlterarNome(id, { nome });
+
+        if (resultado > 0) {
+            res.status(200).send({ message: 'Nome alterado com sucesso' });
+        } else {
+            res.status(404).send({ message: 'Usuário não encontrado' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erro interno do servidor');
+    }
+});
+
 
 
 

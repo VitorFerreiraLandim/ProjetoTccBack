@@ -28,6 +28,35 @@ export async function validarUsuario(pessoa){
     return registros[0][0];
 }
 
+export async function deletarUsuario(id) {
+    const comandoAgendamentos = `
+        DELETE FROM agendamentos_cliente WHERE cliente_id = ?
+    `;
+    
+
+    let respostaAgendamentos = await con.query(comandoAgendamentos, [id]);
+    
+    const comando = `
+        DELETE FROM tb_usuario WHERE id_usuario = ?
+    `;
+    
+
+    let respostaUsuario = await con.query(comando, [id]);
+    let info = respostaUsuario[0];
+
+    return info.affectedRows;
+}
+
+export async function AlterarNome(id,pessoa) {
+    const comando = `
+        update  tb_usuario set nome = ? where id_usuario = ?
+    `
+    let resposta = await con.query(comando, [pessoa.nome, id])
+    let info = resposta[0]
+
+    return info.affectedRows
+}
+
 export async function verificarUsuarioExistente(email, telefone) {
     const comando = `
         SELECT * FROM tb_usuario 

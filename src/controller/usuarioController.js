@@ -27,6 +27,21 @@ endpoints.post('/entrar/', async (req, resp) => {
     }
 })
 
+endpoints.get('/agendamentos', async (req, res) => {
+    try {
+        const agendamentos = await db.consultarServiçoCliente();
+
+        if (agendamentos.length > 0) {
+            res.status(200).send(agendamentos);
+        } else {
+            res.status(404).send({ message: 'Nenhum agendamento encontrado' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erro interno do servidor');
+    }
+});
+
 endpoints.post('/cadastro/',  async (req,resp) => {
     try {
         let pessoa = req.body;

@@ -3,12 +3,27 @@ import con from "./connection.js";
 export async function agendarServiçoCliente(agenda) {
     const comando = `
         INSERT INTO agendamentos_cliente (cliente_id, trabalho, valor, dia, hora) VALUES (?, ?, ?, ?, ?)
-    `
-    let resposta = await con.query(comando, [agenda.cliente_id,agenda.trabalho,agenda.valor, agenda.dia,agenda.hora])
-    let info = resposta[0]
+    `;
+    let resposta = await con.query(comando, [agenda.cliente_id, agenda.trabalho, agenda.valor, agenda.dia, agenda.hora]);
+    let info = resposta[0];
 
     return info.insertId;
 }
+
+export async function consultarServiçoCliente(clienteId) {
+    const comando = `
+        SELECT id, cliente_id, trabalho, valor, dia, hora
+        FROM agendamentos_cliente
+        WHERE cliente_id = ?
+    `;
+    let resposta = await con.query(comando, [clienteId]);
+    let registro = resposta[0];
+
+    return registro;
+}
+
+
+
 
 export async function deletarServicoCliente(id){
     const comando=`
@@ -32,7 +47,7 @@ export async function agendarServiçoAdm(agenda) {
     return info.insertId
 }
 
-export default function deletartServicoAdm(id) {
+export async function deletartServicoAdm(id) {
     const comando = `
      delete  from agendamentos_adm where id = ?
     `
@@ -42,7 +57,7 @@ export default function deletartServicoAdm(id) {
     return info.affectedRows
 }
 
-async function verificarHorarioOcupado(dia, hora) {
+export async function verificarHorarioOcupado(dia, hora) {
     const existingAppointment = await con.collection('agendamentos').findOne({ dia, hora });
     return existingAppointment !== null;
 }

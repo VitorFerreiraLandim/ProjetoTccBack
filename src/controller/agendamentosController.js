@@ -6,11 +6,6 @@ endpoints.post('/agendamentos', async (req, res) => {
     try {
         const agenda = req.body;
 
-
-        if (!agenda.cliente_id || !agenda.trabalho || !agenda.valor || !agenda.dia || !agenda.hora) {
-            return res.status(400).send('Todos os campos são obrigatórios');
-        }
-
         const agendamentoCliente = await db.agendarServiçoCliente(agenda);
 
         if (agendamentoCliente) {

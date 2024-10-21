@@ -41,3 +41,8 @@ export default function deletartServicoAdm(id) {
 
     return info.affectedRows
 }
+
+async function verificarHorarioOcupado(dia, hora) {
+    const existingAppointment = await con.collection('agendamentos').findOne({ dia, hora });
+    return existingAppointment !== null;
+}

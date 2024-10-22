@@ -23,8 +23,6 @@ export async function consultarServiçoCliente(clienteId) {
 }
 
 
-
-
 export async function deletarServicoCliente(id){
     const comando=`
         delete  from agendamentos_cliente where id = ?

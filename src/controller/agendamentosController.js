@@ -26,7 +26,7 @@ endpoints.post('/agendamentos', async (req, res) => {
 
 endpoints.get('/agendamento', async (req, resp) => {
     try {
-        const clienteId = req.query.cliente_id; // Obtendo o ID do cliente da query
+        const clienteId = req.query.cliente_id; 
         const agendamentos = await db.consultarServiçoCliente(clienteId);
         resp.send(agendamentos);
     } catch (error) {
@@ -35,7 +35,21 @@ endpoints.get('/agendamento', async (req, resp) => {
     }
 });
 
-
+endpoints.delete('/agendamento/:id', async (req,resp) =>{
+    try {
+        let id = req.params.id
+        let linhasAfetadas = await  db.deletarServicoCliente(id)
+        if (linhasAfetadas >=  1) {
+            resp.send()
+        }else{
+            resp.status(404).send({erro: 'Nenhum registro encontrado'})
+        }
+    } catch (error) {
+        resp.status(400).send({
+            erro: error.message
+        })
+    }
+})
 
 
 endpoints.post('/agendamentos_adm', async(req,res) =>{

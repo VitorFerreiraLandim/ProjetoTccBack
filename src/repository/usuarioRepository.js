@@ -17,7 +17,8 @@ export async function validarUsuario(pessoa){
     const comando = `
         select 
             id_usuario id,
-            email email
+            email email,
+            nome nome
         from tb_usuario 
         where 
             email = ?

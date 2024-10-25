@@ -9,6 +9,12 @@ endpoints.post('/agendamentos', async (req, res) => {
         if (!agenda.cliente_id || !agenda.trabalho || !agenda.valor || !agenda.dia || !agenda.hora) {
             return res.status(400).send('Dados incompletos');
         }
+
+        const horariosOcupados = await db.consultarHorariosOcupados(agenda.dia);
+        if (horariosOcupados.includes(agenda.hora)) {
+            return res.status(400).send('Horário já agendado');
+        }
+
         const agendamentoCliente = await db.agendarServiçoCliente(agenda);
 
         if (agendamentoCliente) {
@@ -27,6 +33,27 @@ endpoints.post('/agendamentos', async (req, res) => {
         res.status(500).send('Erro interno do servidor');
     }
 });
+
+
+
+endpoints.get('/disponibilidade/:data', async (req, res) => {
+    const diaSelecionado = req.params.data;
+
+    console.log('Dia selecionado:', diaSelecionado); 
+
+    try {
+        const horariosOcupados = await db.consultarHorariosOcupados(diaSelecionado);
+        console.log('Horários ocupados:', horariosOcupados);
+
+        res.json(horariosOcupados);
+    } catch (error) {
+        console.error('Erro ao buscar horários:', error);
+        res.status(500).send('Erro interno do servidor');
+    }
+});
+
+
+
 
 endpoints.get('/agendamento', async (req, resp) => {
     try {

@@ -22,6 +22,18 @@ export async function consultarServiçoCliente(clienteId) {
     return registro;
 }
 
+export async function consultarHorariosOcupados(dia) {
+    const comando = `
+        SELECT hora FROM agendamentos_cliente WHERE dia = ?
+    `;
+    let resposta = await con.query(comando, [dia]);
+    let registros = resposta[0];
+
+
+    return registros.map(registro => registro.hora);
+}
+
+
 
 export async function deletarServicoCliente(id){
     const comando=`
@@ -54,6 +66,21 @@ export async function deletartServicoAdm(id) {
 
     return info.affectedRows
 }
+
+export async function consultarServicoAdm(id) {
+    const comando = `
+    SELECT * FROM agendamentos_adm WHERE id = ?
+    `;
+    
+    let resposta = await con.query(comando, [id]);
+    
+    if (resposta.length > 0) {
+        return resposta[0]; 
+    } else {
+        throw new Error('Agendamento não encontrado');
+    }
+}
+
 
 export async function verificarHorarioOcupado(dia, hora) {
     const existingAppointment = await con.collection('agendamentos').findOne({ dia, hora });

@@ -18,7 +18,8 @@ export async function validarUsuario(pessoa){
         select 
             id_usuario id,
             email email,
-            nome nome
+            nome nome,
+            telefone telefone
         from tb_usuario 
         where 
             email = ?

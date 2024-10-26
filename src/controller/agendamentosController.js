@@ -39,11 +39,10 @@ endpoints.post('/agendamentos', async (req, res) => {
 endpoints.get('/disponibilidade/:data', async (req, res) => {
     const diaSelecionado = req.params.data;
 
-    console.log('Dia selecionado:', diaSelecionado); 
+   
 
     try {
         const horariosOcupados = await db.consultarHorariosOcupados(diaSelecionado);
-        console.log('Horários ocupados:', horariosOcupados);
 
         res.json(horariosOcupados);
     } catch (error) {
@@ -51,8 +50,6 @@ endpoints.get('/disponibilidade/:data', async (req, res) => {
         res.status(500).send('Erro interno do servidor');
     }
 });
-
-
 
 
 endpoints.get('/agendamento', async (req, resp) => {
@@ -98,6 +95,35 @@ try {
     res.status(500).send('Erro interno do servidor');
 }
 })
+
+
+endpoints.get('/agendamentos_adm', async (req, resp) => {
+    try {
+        const agendamentos = await db.consultarServicoAdm();
+        resp.send(agendamentos);
+    } catch (error) {
+        console.error('Erro ao obter agendamentos:', error);
+        resp.status(500).send('Erro interno do servidor');
+    }
+})
+
+endpoints.delete('/agendamento_adm/:id', async (req, resp) => {
+    try {
+        let id = req.params.id; 
+        let linhasAfetadas = await db.deletartServicoAdm(id);
+        if (linhasAfetadas >= 1) {
+            resp.send(); 
+        } else {
+            resp.status(404).send({ erro: 'Nenhum registro encontrado' }); 
+        }
+    } catch (error) {
+        resp.status(400).send({
+            erro: error.message
+        });
+    }
+});
+
+
 
 
 

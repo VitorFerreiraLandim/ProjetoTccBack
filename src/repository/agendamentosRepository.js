@@ -33,8 +33,6 @@ export async function consultarHorariosOcupados(dia) {
     return registros.map(registro => registro.hora);
 }
 
-
-
 export async function deletarServicoCliente(id){
     const comando=`
         delete  from agendamentos_cliente where id = ?
@@ -58,18 +56,26 @@ export async function agendarServiçoAdm(agenda) {
 }
 
 export async function deletartServicoAdm(id) {
-    const comando = `
-     delete  from agendamentos_adm where id = ?
-    `
-    let resposta = con.query(comando, [id])
-    let info = resposta[0]
 
-    return info.affectedRows
+    const verificarRegistro = await con.query('SELECT * FROM agendamentos_adm WHERE id = ?', [id]);
+
+    if (verificarRegistro.length === 0) {
+        console.log("Nenhum registro encontrado para o ID:", id);
+        return 0; 
+    }
+    const comando = `
+        DELETE FROM agendamentos_adm WHERE id = ?
+    `;
+
+    let resposta = await con.query(comando, [id]);
+    return info.affectedRows;
 }
+
+
 
 export async function consultarServicoAdm(id) {
     const comando = `
-    SELECT * FROM agendamentos_adm WHERE id = ?
+    SELECT * FROM agendamentos_adm 
     `;
     
     let resposta = await con.query(comando, [id]);

@@ -17,7 +17,8 @@ endpoints.post('/entrar/', async (req, resp) => {
             resp.send({
                 "token": token,
                 "id": usuario.id,
-                "nome": usuario.nome
+                "nome": usuario.nome,
+                "telefone": usuario.telefone
             })
         }
     }

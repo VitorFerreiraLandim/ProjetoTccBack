@@ -117,6 +117,7 @@ endpoints.delete('/agendamento_adm/:id', async (req, resp) => {
             resp.status(404).send({ erro: 'Nenhum registro encontrado' }); 
         }
     } catch (error) {
+
         resp.status(400).send({
             erro: error.message
         });

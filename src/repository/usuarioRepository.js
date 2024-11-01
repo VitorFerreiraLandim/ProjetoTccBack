@@ -88,19 +88,16 @@ export async function redefinirSenha(novaSenha, email) {
     return resultado[0].affectedRows > 0;
 }
 
-// Função para salvar imagem no banco de dados
-export async function salvarImagem(id_usuario, caminhoImagem) {
-    const query = 'INSERT INTO tb_imagem (id_usuario, caminho) VALUES (?, ?)';
-    const [resultado] = await con.query(query, [id_usuario, caminhoImagem]);
-    return resultado.insertId; // Retorna o ID da nova imagem
+export async function atualizarImagemPerfil(id, imagemPerfil) {
+    const comando = `
+        UPDATE tb_usuario SET imagem_perfil = ? WHERE id_usuario = ?
+    `;
+    let resposta = await con.query(comando, [imagemPerfil, id]);
+    return resposta[0].affectedRows;
 }
 
-// Função para obter imagens do usuário
-export async function obterImagens(id_usuario) {
-    const query = 'SELECT * FROM tb_imagem WHERE id_usuario = ?';
-    const [resultados] = await con.query(query, [id_usuario]);
-    return resultados;
-}
+
+
 
 
 

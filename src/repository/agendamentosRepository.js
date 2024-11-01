@@ -92,3 +92,7 @@ export async function verificarHorarioOcupado(dia, hora) {
     const existingAppointment = await con.collection('agendamentos').findOne({ dia, hora });
     return existingAppointment !== null;
 }
+
+// Adicione esta função ao arquivo usuarioRepository.js
+
+

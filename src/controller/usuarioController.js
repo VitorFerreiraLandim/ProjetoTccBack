@@ -1,33 +1,41 @@
-import {autenticar, gerarToken} from '../utils/jwt.js';
+import { autenticar, gerarToken } from '../utils/jwt.js'; 
 import * as db from '../repository/usuarioRepository.js';
 import { Router } from 'express';
-import nodemailer from 'nodemailer'
+import nodemailer from 'nodemailer';
+import multer from 'multer';
+import path from 'path';
+
 const endpoints = Router();
+
+// Configuração do multer para upload de imagens
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, 'uploads/'),
+    filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+});
+const upload = multer({ storage });
 
 endpoints.post('/entrar/', async (req, resp) => {
     try {
         let pessoa = req.body;
-
         let usuario = await db.validarUsuario(pessoa);
 
         if (usuario == null) {
-            resp.send({ erro: "Email ou senha incorreto(s)" })
+            resp.send({ erro: "Email ou senha incorreto(s)" });
         } else {
             let token = gerarToken(usuario);
             resp.send({
-                "token": token,
-                "id": usuario.id,
-                "nome": usuario.nome,
-                "telefone": usuario.telefone
-            })
+                token,
+                id: usuario.id,
+                nome: usuario.nome,
+                telefone: usuario.telefone,
+                imagemPerfil: usuario.imagem_perfil 
+            });
         }
     }
     catch (err) {
-        resp.status(400).send({
-            erro: err.message
-        })
+        resp.status(400).send({ erro: err.message });
     }
-})
+});
 
 endpoints.get('/agendamentos', async (req, res) => {
     try {
@@ -44,34 +52,25 @@ endpoints.get('/agendamentos', async (req, res) => {
     }
 });
 
-endpoints.post('/cadastro/',  async (req,resp) => {
+endpoints.post('/cadastro/', async (req, resp) => {
     try {
         let pessoa = req.body;
 
-        
-
         const usuarioExistente = await db.verificarUsuarioExistente(pessoa.email, pessoa.telefone);
         if (usuarioExistente.length > 0) {
-            return resp.status(400).send({
-                erro: "Email ou telefone já cadastrados."
-            });
+            return resp.status(400).send({ erro: "Email ou telefone já cadastrados." });
         }
 
         let id = await db.cadastrarUsuario(pessoa);
-
-        resp.send({
-            novoId: id
-        })
+        resp.send({ novoId: id });
     } catch (err) {
-        resp.status(400).send({
-            erro: err.message
-        })
+        resp.status(400).send({ erro: err.message });
     }
-})
+});
 
 endpoints.post('/verificar-email', async (req, res) => {
     const { email } = req.body;
-    const apiKey = '5fae6172b8d6f7789a678d33f224a42667e52aaa'; 
+    const apiKey = '5fae6172b8d6f7789a678d33f224a42667e52aaa';
     const url = `https://api.hunter.io/v2/email-verifier?email=${email}&api_key=${apiKey}`;
 
     try {
@@ -83,32 +82,22 @@ endpoints.post('/verificar-email', async (req, res) => {
     }
 });
 
-
-
-
 endpoints.post('/verificar-email2', async (req, resp) => {
     try {
         const { email } = req.body;
-
-        
         const existe = await db.verificarEmail(email);
 
         if (existe) {
-            const codigo = Math.floor(100000 + Math.random() * 900000); 
-            
+            const codigo = Math.floor(100000 + Math.random() * 900000);
             await enviarEmail(email, codigo);
-            
-            resp.send({ existe: true, codigo }); 
+            resp.send({ existe: true, codigo });
         } else {
             resp.send({ existe: false });
         }
     } catch (err) {
-        resp.status(400).send({
-            erro: err.message
-        });
+        resp.status(400).send({ erro: err.message });
     }
 });
-
 
 async function enviarEmail(email, codigo) {
     const transporter = nodemailer.createTransport({
@@ -116,8 +105,8 @@ async function enviarEmail(email, codigo) {
         port: 465,
         secure: true,
         auth: {
-            user: 'vitorferreiralandim14@gmail.com', 
-            pass: 'z a b g e z j v p t c s a l k j' 
+            user: 'vitorferreiralandim14@gmail.com',
+            pass: 'z a b g e z j v p t c s a l k j'
         }
     });
 
@@ -129,13 +118,13 @@ async function enviarEmail(email, codigo) {
         <div style="font-family: Arial, sans-serif; background-color: #f7f7f7; padding: 20px; border-radius: 5px;">
             <div style="max-width: 600px; margin: auto; background-color: white; padding: 20px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                 <h2 style="color: #6A0DAD;">Redefinição de Senha</h2>
-                <p style="color: #333;">Olá,</p>
-                <p style="color: #333;">Você solicitou a redefinição da sua senha. Use o código abaixo para prosseguir:</p>
-                <h3 style="color: #6A0DAD; font-size: 24px;">${codigo}</h3>
-                <p style="color: #333;">Se você não solicitou essa mudança, pode ignorar este email.</p>
+                <p>Olá,</p>
+                <p>Você solicitou a redefinição da sua senha. Use o código abaixo para prosseguir:</p>
+                <h3>${codigo}</h3>
+                <p>Se você não solicitou essa mudança, pode ignorar este email.</p>
                 <hr style="border: 1px solid #6A0DAD;">
                 <footer style="text-align: center; color: #777;">
-                    <p>&copy; ${new Date().getFullYear()} Sua Empresa. Todos os direitos reservados.</p>
+                    <p>&copy; ${new Date().getFullYear()} Lene Cabeleleira. Todos os direitos reservados.</p>
                 </footer>
             </div>
         </div>
@@ -148,7 +137,6 @@ async function enviarEmail(email, codigo) {
 endpoints.post('/redefinir-senha', async (req, resp) => {
     try {
         const { novaSenha, email } = req.body;
-
         const resultado = await db.redefinirSenha(novaSenha, email);
 
         if (resultado) {
@@ -201,7 +189,22 @@ endpoints.put('/usuarios/:id', async (req, res) => {
     }
 });
 
+// Endpoint para upload de imagem de perfil
+endpoints.post('/usuario/:id/upload-imagem', upload.single('imagem'), async (req, resp) => {
+    try {
+        const { id } = req.params;
+        const imagemPerfil = req.file ? req.file.path : null;
 
+        if (!imagemPerfil) {
+            return resp.status(400).send({ erro: 'Nenhuma imagem foi carregada.' });
+        }
+
+        await db.atualizarImagemPerfil(id, imagemPerfil);
+        resp.send({ sucesso: true, mensagem: 'Imagem de perfil atualizada com sucesso!', imagem: imagemPerfil });
+    } catch (err) {
+        resp.status(500).send({ erro: 'Erro ao atualizar imagem de perfil.' });
+    }
+});
 
 
 export default endpoints;

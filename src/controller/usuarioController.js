@@ -7,12 +7,7 @@ import path from 'path';
 
 const endpoints = Router();
 
-// Configuração do multer para upload de imagens
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'uploads/'),
-    filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
-});
-const upload = multer({ storage });
+
 
 endpoints.post('/entrar/', async (req, resp) => {
     try {
@@ -28,7 +23,7 @@ endpoints.post('/entrar/', async (req, resp) => {
                 id: usuario.id,
                 nome: usuario.nome,
                 telefone: usuario.telefone,
-                imagemPerfil: usuario.imagem_perfil 
+                imagemPerfil: usuario.imagem_perfil,
             });
         }
     }
@@ -36,6 +31,7 @@ endpoints.post('/entrar/', async (req, resp) => {
         resp.status(400).send({ erro: err.message });
     }
 });
+
 
 endpoints.get('/agendamentos', async (req, res) => {
     try {
@@ -189,22 +185,7 @@ endpoints.put('/usuarios/:id', async (req, res) => {
     }
 });
 
-// Endpoint para upload de imagem de perfil
-endpoints.post('/usuario/:id/upload-imagem', upload.single('imagem'), async (req, resp) => {
-    try {
-        const { id } = req.params;
-        const imagemPerfil = req.file ? req.file.path : null;
 
-        if (!imagemPerfil) {
-            return resp.status(400).send({ erro: 'Nenhuma imagem foi carregada.' });
-        }
-
-        await db.atualizarImagemPerfil(id, imagemPerfil);
-        resp.send({ sucesso: true, mensagem: 'Imagem de perfil atualizada com sucesso!', imagem: imagemPerfil });
-    } catch (err) {
-        resp.status(500).send({ erro: 'Erro ao atualizar imagem de perfil.' });
-    }
-});
 
 
 export default endpoints;

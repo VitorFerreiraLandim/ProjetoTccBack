@@ -88,13 +88,6 @@ export async function redefinirSenha(novaSenha, email) {
     return resultado[0].affectedRows > 0;
 }
 
-export async function atualizarImagemPerfil(id, imagemPerfil) {
-    const comando = `
-        UPDATE tb_usuario SET imagem_perfil = ? WHERE id_usuario = ?
-    `;
-    let resposta = await con.query(comando, [imagemPerfil, id]);
-    return resposta[0].affectedRows;
-}
 
 
 

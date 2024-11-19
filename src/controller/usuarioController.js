@@ -101,8 +101,8 @@ async function enviarEmail(email, codigo) {
         port: 465,
         secure: true,
         auth: {
-            user: 'vitorferreiralandim14@gmail.com',
-            pass: 'z a b g e z j v p t c s a l k j'
+            user: 'lenecabelereira1@gmail.com',
+            pass: 'teqd axmp ztac lveu'
         }
     });
 
